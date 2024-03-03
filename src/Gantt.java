@@ -17,6 +17,7 @@ class TimeRange {
 }
 
 public class Gantt {
+    private boolean canContinue = true;
     private String name;
     private List<TimeRange> timeRangeList = new ArrayList<>();
     public Gantt(String name) {
@@ -25,21 +26,42 @@ public class Gantt {
     public void add(TimeRange timeRange) {
         timeRangeList.add(timeRange);
     }
-    private final String GAP = "     ";
+    private final String GAP = " ";
+
+    public void setCanContinue(boolean canContinue) {
+        this.canContinue = canContinue;
+    }
+
     public String toString() {
         StringBuilder string = new StringBuilder();
         string.append(name + " Gantt Chart\n");
         StringBuilder table = new StringBuilder();
         List<Integer> timeList = new ArrayList<>();
         timeList.add(0);
-        for (TimeRange timeRange: timeRangeList) {
+        for (int x = 0; x < timeRangeList.size();) {
+            TimeRange timeRange = timeRangeList.get(x);
+            int start = timeRange.getStartTime();
+
+            while (canContinue && x < timeRangeList.size() && timeRange.getProcessId() != -1 && timeRange.getProcessId() == timeRangeList.get(x).getProcessId()) {
+                timeRange = timeRangeList.get(x);
+                ++x;
+            }
+            while (x < timeRangeList.size() && timeRange.getProcessId() == -1 && timeRangeList.get(x).getProcessId() == -1) {
+                timeRange = timeRangeList.get(x);
+                ++x;
+            }
+
+            int stop = timeRange.getStopTime();
+
             table.append("|");
+
             timeList.add(timeRange.getStopTime());
-            for (int i = 0; i < timeRange.getStopTime() - timeRange.getStartTime(); ++i) {
-                if (timeRange.getProcessId() != -1 && i == (timeRange.getStopTime() - timeRange.getStartTime()) / 2)
+            for (int i = 0; i < stop - start; ++i) {
+                if (timeRange.getProcessId() != -1 && i == (stop - start) / 2)
                     table.append("P" + timeRange.getProcessId());
                 table.append(GAP);
             }
+            if (!canContinue) ++x;
         }
         table.append("|");
         for (int i = 0; i < table.length(); ++i) {

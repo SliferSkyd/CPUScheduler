@@ -36,7 +36,7 @@ public class PriorityPreemptive {
                 curTime = Math.min(curTime + task.getRemainingTime(), taskList.get(i).getArrivalTime());
                 int stopTime = curTime;
                 if (startTime < stopTime) {
-                    gantt.add(new TimeRange(task.getPriority(), startTime, stopTime));
+                    gantt.add(new TimeRange(task.getId(), startTime, stopTime));
                     task.setFirstRunTime(startTime);
                 }
                 if (curTime < task.getArrivalTime() + task.getRemainingTime()) {

@@ -3,6 +3,7 @@ import java.util.*;
 public class RoundRobin {
     public void execute(List<Task> taskList, int Q) {
         Gantt gantt = new Gantt("Round Robin");
+        gantt.setCanContinue(false);
         Collections.sort(taskList, new Comparator<Task>() {
             @Override
             public int compare(Task t0, Task t1) {
