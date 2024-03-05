@@ -17,6 +17,8 @@ public class PriorityPreemptive {
             public int compare(Task t0, Task t1) {
                 if (t0.getPriority() != t1.getPriority())
                     return Integer.compare(t0.getPriority(), t1.getPriority());
+                if (t0.getArrivalTime() != t1.getArrivalTime())
+                    return Integer.compare(t0.getArrivalTime(), t1.getArrivalTime());
                 return Integer.compare(t0.getRemainingTime(), t1.getRemainingTime());
             }
         });

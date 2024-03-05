@@ -1,6 +1,4 @@
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class PriorityNonPreemptive {
     public void execute(List<Task> taskList) {
@@ -8,19 +6,50 @@ public class PriorityNonPreemptive {
         Collections.sort(taskList, new Comparator<Task>() {
             @Override
             public int compare(Task t0, Task t1) {
-                if (t0.getArrivalTime() != t1.getArrivalTime())
-                    return Integer.compare(t0.getArrivalTime(), t1.getArrivalTime());
-                return Integer.compare(t0.getPriority(), t1.getPriority());
+                if (t0.getArrivalTime() == t1.getArrivalTime())
+                    return Integer.compare(t0.getPriority(), t1.getPriority());
+                return Integer.compare(t0.getArrivalTime(), t1.getArrivalTime());
             }
         });
-        int curTime = 0;
-        for (Task task: taskList) {
-            if (curTime < task.getArrivalTime()) {
-                gantt.add(new TimeRange(-1, curTime, task.getArrivalTime()));
+
+        Queue<Task> queue = new PriorityQueue<>(new Comparator<Task>() {
+            @Override
+            public int compare(Task t0, Task t1) {
+                if (t0.getPriority() != t1.getPriority())
+                    return Integer.compare(t0.getPriority(), t1.getPriority());
+                if (t0.getArrivalTime() != t1.getArrivalTime())
+                    return Integer.compare(t0.getArrivalTime(), t1.getArrivalTime());
+                return Integer.compare(t0.getRemainingTime(), t1.getRemainingTime());
             }
-            curTime = Math.max(curTime, task.getArrivalTime());
-            task.setFirstRunTime(curTime);
+        });
+
+        int curTime = 0;
+
+        for (int i = 0; i < taskList.size(); ) {
+            if (queue.isEmpty()) {
+                int startTime = curTime;
+                curTime = taskList.get(i).getArrivalTime();
+                int stopTime = curTime;
+                if (startTime < stopTime) {
+                    gantt.add(new TimeRange(-1, startTime, stopTime));
+                }
+            } else {
+                Task task = queue.poll();
+                int startTime = curTime;
+                task.setFirstRunTime(startTime);
+                curTime += task.getBurstTime();
+                int stopTime = curTime;
+                task.setDoneTime(stopTime);
+                gantt.add(new TimeRange(task.getId(), startTime, stopTime));
+            }
+            while (i < taskList.size() && taskList.get(i).getArrivalTime() <= curTime) {
+                queue.add(taskList.get(i++));
+            }
+        }
+        while (!queue.isEmpty()) {
+            Task task = queue.poll();
             int startTime = curTime;
+            task.setFirstRunTime(startTime);
             curTime += task.getBurstTime();
             int stopTime = curTime;
             task.setDoneTime(stopTime);

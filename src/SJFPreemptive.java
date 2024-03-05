@@ -17,6 +17,8 @@ public class SJFPreemptive {
             public int compare(Task t0, Task t1) {
                 if (t0.getRemainingTime() != t1.getRemainingTime())
                     return Integer.compare(t0.getRemainingTime(), t1.getRemainingTime());
+                if (t0.getArrivalTime() != t1.getArrivalTime())
+                    return Integer.compare(t0.getArrivalTime(), t1.getArrivalTime());
                 return Integer.compare(t0.getId(), t1.getId());
             }
         });
